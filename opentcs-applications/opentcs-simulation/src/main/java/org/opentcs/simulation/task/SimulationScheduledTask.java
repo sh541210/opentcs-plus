@@ -60,8 +60,8 @@ public class SimulationScheduledTask {
      * 每 5 分钟自动执行一轮仿真测试。
      * fixedDelay 保证上一轮完全结束后再计时，避免并发执行。
      */
-    @Scheduled(fixedDelayString = "${simulation.schedule.interval-ms:300000}",
-               initialDelayString = "${simulation.schedule.initial-delay-ms:60000}")
+//    @Scheduled(fixedDelayString = "${simulation.schedule.interval-ms:300000}",
+//               initialDelayString = "${simulation.schedule.initial-delay-ms:60000}")
     public void runCycle() {
         long cycle = cycleCount.incrementAndGet();
         log.info("===== 仿真定时任务 第 {} 轮 开始 =====", cycle);

@@ -33,9 +33,9 @@ spring:
         master:
           type: ${spring.datasource.type}
           driverClassName: com.mysql.cj.jdbc.Driver
-          url: jdbc:mysql://106.54.43.41:3306/opentcs?useUnicode=true&characterEncoding=UTF-8&zeroDateTimeBehavior=convertToNull&useSSL=false&serverTimezone=GMT%2B8&autoReconnect=true&rewriteBatchedStatements=true&allowPublicKeyRetrieval=true&nullCatalogMeansCurrent=true&connectionCollation=utf8mb4_unicode_ci
-          username: opentcs
-          password: 'Opentcs@2024!DB'
+          url: jdbc:mysql://pei-sheng.cloud:8097/opentcs?useUnicode=true&characterEncoding=UTF-8&zeroDateTimeBehavior=convertToNull&useSSL=false&serverTimezone=GMT%2B8&autoReconnect=true&rewriteBatchedStatements=true&allowPublicKeyRetrieval=true&nullCatalogMeansCurrent=true&connectionCollation=utf8mb4_unicode_ci
+          username: root
+          password: ibiot
       hikari:
         # 最大连接池数量
         maxPoolSize: 20
@@ -58,13 +58,13 @@ spring:
 spring.data:
   redis:
     # 地址
-    host: 106.54.43.41
+    host: 127.0.0.1
     # 端口，默认为6379
     port: 6379
     # 数据库索引
     database: 0
     # redis 密码必须配置
-    password: 'Redis@2024!Cache'
+    #password: 'Redis@2024!Cache'
     # 连接超时时间
     timeout: 10s
     # 是否开启ssl

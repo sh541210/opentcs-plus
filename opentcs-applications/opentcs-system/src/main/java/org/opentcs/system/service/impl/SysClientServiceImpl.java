@@ -52,7 +52,7 @@ public class SysClientServiceImpl implements ISysClientService {
     /**
      * 查询客户端管理
      */
-    @Cacheable(cacheNames = CacheNames.SYS_CLIENT, key = "#clientId")
+//    @Cacheable(cacheNames = CacheNames.SYS_CLIENT, key = "#clientId")
     @Override
     public SysClientVo queryByClientId(String clientId) {
         return baseMapper.selectVoOne(new LambdaQueryWrapper<SysClient>().eq(SysClient::getClientId, clientId));
