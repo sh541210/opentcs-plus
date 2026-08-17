@@ -11,13 +11,26 @@ spring.boot.admin.client:
   username: @monitor.username@
   password: @monitor.password@
 
-# 禁用 XXL-JOB 配置以避免 ClassNotFoundException
-xxl:
-  job:
-    enabled: false
 
 # 数据源配置
 spring:
+  flyway:
+    enabled: true
+    url: jdbc:mysql://127.0.0.1:3306/opentcsplus?useUnicode=true&characterEncoding=UTF-8&zeroDateTimeBehavior=convertToNull&useSSL=false&serverTimezone=GMT%2B8&allowPublicKeyRetrieval=true
+    user: root
+    password:
+    locations:
+      - filesystem:db/migration
+      - filesystem:../db/migration
+      - filesystem:db/repeatable
+      - filesystem:../db/repeatable
+    table: flyway_schema_history
+    encoding: UTF-8
+    validate-on-migrate: true
+    baseline-on-migrate: true
+    baseline-version: 1.0.1
+    out-of-order: false
+    clean-disabled: true
   datasource:
     type: com.zaxxer.hikari.HikariDataSource
     # 动态数据源文档 https://www.kancloud.cn/tracy5546/dynamic-datasource/content
@@ -62,7 +75,7 @@ spring.data:
     # 端口，默认为6379
     port: 6379
     # 数据库索引
-    database: 0
+    database: 1
     # redis 密码必须配置
     #password: 'Redis@2024!Cache'
     # 连接超时时间

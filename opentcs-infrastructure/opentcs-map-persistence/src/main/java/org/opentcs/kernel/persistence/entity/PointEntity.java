@@ -18,7 +18,7 @@ import java.math.BigDecimal;
  */
 @EqualsAndHashCode(callSuper = true)
 @Data
-@TableName("point")
+@TableName("tcs_point")
 public class PointEntity extends DataEntity {
 
     /**
@@ -72,7 +72,7 @@ public class PointEntity extends DataEntity {
     private BigDecimal zPosition;
 
     /**
-     * 车辆方向角度（弧度）
+     * 车辆方向角度（度，与地图编辑器属性面板一致）
      */
     private BigDecimal vehicleOrientation;
 

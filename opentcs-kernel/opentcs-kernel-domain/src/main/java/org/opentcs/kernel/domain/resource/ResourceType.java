@@ -7,7 +7,6 @@ public enum ResourceType {
     POINT,
     PATH,
     LOCATION,
-    BLOCK,
     CHARGER,
     ELEVATOR
 }

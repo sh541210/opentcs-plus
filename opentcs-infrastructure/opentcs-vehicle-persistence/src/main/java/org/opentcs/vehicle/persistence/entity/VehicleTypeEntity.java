@@ -17,7 +17,7 @@ import java.util.List;
  * 配置表，完整审计字段
  */
 @Data
-@TableName(value = "vehicle_type", autoResultMap = true)
+@TableName(value = "tcs_vehicle_type", autoResultMap = true)
 public class VehicleTypeEntity extends ConfigEntity {
 
     /**
@@ -32,6 +32,11 @@ public class VehicleTypeEntity extends ConfigEntity {
     private Long brandId;
 
     /**
+     * 类型编码
+     */
+    private String code;
+
+    /**
      * 品牌名称（非数据库字段，来自JOIN查询）
      */
     @TableField(exist = false)
@@ -41,6 +46,11 @@ public class VehicleTypeEntity extends ConfigEntity {
      * 车辆类型名称
      */
     private String name;
+
+    /**
+     * 车辆形态
+     */
+    private String category;
 
     /**
      * 车辆长度

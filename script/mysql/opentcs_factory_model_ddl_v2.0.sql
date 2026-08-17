@@ -2,27 +2,27 @@
 -- OpenTCS Plus 工厂模型 SQL (全新创建)
 -- ============================================================
 
-USE opentcs;
+USE opentcsplus;
 
 -- ============================================================
 -- 删除所有相关表（按外键依赖顺序）
 -- ============================================================
-DROP TABLE IF EXISTS elevator_schedule;
-DROP TABLE IF EXISTS cross_layer_connection;
-DROP TABLE IF EXISTS location;
-DROP TABLE IF EXISTS block;
-DROP TABLE IF EXISTS point;
-DROP TABLE IF EXISTS path;
-DROP TABLE IF EXISTS factory_layer;
-DROP TABLE IF EXISTS factory_layer_group;
-DROP TABLE IF EXISTS location_type;
-DROP TABLE IF EXISTS navigation_map;
-DROP TABLE IF EXISTS factory_model;
+DROP TABLE IF EXISTS tcs_elevator_schedule;
+DROP TABLE IF EXISTS tcs_cross_layer_connection;
+DROP TABLE IF EXISTS tcs_location;
+DROP TABLE IF EXISTS tcs_block;
+DROP TABLE IF EXISTS tcs_point;
+DROP TABLE IF EXISTS tcs_path;
+DROP TABLE IF EXISTS tcs_factory_layer;
+DROP TABLE IF EXISTS tcs_factory_layer_group;
+DROP TABLE IF EXISTS tcs_location_type;
+DROP TABLE IF EXISTS tcs_navigation_map;
+DROP TABLE IF EXISTS tcs_factory_model;
 
 -- ============================================================
 -- 工厂模型表 (FactoryModel)
 -- ============================================================
-CREATE TABLE factory_model (
+CREATE TABLE tcs_factory_model (
     id BIGINT NOT NULL AUTO_INCREMENT COMMENT '主键ID',
     factory_id VARCHAR(64) NOT NULL COMMENT '工厂唯一标识符',
     name VARCHAR(255) NOT NULL COMMENT '工厂名称',
@@ -48,7 +48,7 @@ CREATE TABLE factory_model (
 -- ============================================================
 -- 导航地图表 (NavigationMap)
 -- ============================================================
-CREATE TABLE navigation_map (
+CREATE TABLE tcs_navigation_map (
     id BIGINT NOT NULL AUTO_INCREMENT COMMENT '主键ID',
     factory_model_id BIGINT NOT NULL COMMENT '所属工厂模型ID',
     map_id VARCHAR(64) NOT NULL COMMENT '地图唯一标识',
@@ -67,29 +67,14 @@ CREATE TABLE navigation_map (
     del_flag CHAR(1) DEFAULT '0',
     status CHAR(1) DEFAULT '0',
     CONSTRAINT pk_navigation_map PRIMARY KEY (id),
-    CONSTRAINT fk_navigation_map_factory FOREIGN KEY (factory_model_id) REFERENCES factory_model(id) ON DELETE CASCADE,
+    CONSTRAINT fk_navigation_map_factory FOREIGN KEY (factory_model_id) REFERENCES tcs_factory_model(id) ON DELETE CASCADE,
     CONSTRAINT uk_navigation_map_factory_map UNIQUE (factory_model_id, map_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='导航地图表';
 
 -- ============================================================
--- 位置类型表 (LocationType) - 全局共享，不按工厂隔离
--- ============================================================
-CREATE TABLE location_type (
-    id BIGINT NOT NULL AUTO_INCREMENT COMMENT '主键ID',
-    name VARCHAR(255) NOT NULL COMMENT '位置类型名称',
-    allowed_operations JSON COMMENT '允许的操作列表',
-    allowed_peripheral_operations JSON COMMENT '允许的外围设备操作',
-    properties JSON COMMENT '扩展属性',
-    create_time DATETIME DEFAULT CURRENT_TIMESTAMP,
-    update_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    del_flag CHAR(1) DEFAULT '0',
-    CONSTRAINT pk_location_type PRIMARY KEY (id)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='位置类型表';
-
--- ============================================================
 -- 图层组表 (LayerGroup)
 -- ============================================================
-CREATE TABLE factory_layer_group (
+CREATE TABLE tcs_factory_layer_group (
     id BIGINT NOT NULL AUTO_INCREMENT COMMENT '主键ID',
     navigation_map_id BIGINT NOT NULL COMMENT '所属导航地图ID',
     name VARCHAR(255) NOT NULL COMMENT '图层组名称',
@@ -102,13 +87,13 @@ CREATE TABLE factory_layer_group (
     update_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     del_flag CHAR(1) DEFAULT '0',
     CONSTRAINT pk_factory_layer_group PRIMARY KEY (id),
-    CONSTRAINT fk_factory_layer_group_navigation_map FOREIGN KEY (navigation_map_id) REFERENCES navigation_map(id) ON DELETE CASCADE
+    CONSTRAINT fk_factory_layer_group_navigation_map FOREIGN KEY (navigation_map_id) REFERENCES tcs_navigation_map(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='图层组表';
 
 -- ============================================================
 -- 图层表 (Layer)
 -- ============================================================
-CREATE TABLE factory_layer (
+CREATE TABLE tcs_factory_layer (
     id BIGINT NOT NULL AUTO_INCREMENT COMMENT '主键ID',
     navigation_map_id BIGINT NOT NULL COMMENT '所属导航地图ID',
     layer_group_id BIGINT COMMENT '所属图层组ID',
@@ -122,14 +107,14 @@ CREATE TABLE factory_layer (
     update_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     del_flag CHAR(1) DEFAULT '0',
     CONSTRAINT pk_factory_layer PRIMARY KEY (id),
-    CONSTRAINT fk_factory_layer_navigation_map FOREIGN KEY (navigation_map_id) REFERENCES navigation_map(id) ON DELETE CASCADE,
-    CONSTRAINT fk_factory_layer_layer_group FOREIGN KEY (layer_group_id) REFERENCES factory_layer_group(id) ON DELETE SET NULL
+    CONSTRAINT fk_factory_layer_navigation_map FOREIGN KEY (navigation_map_id) REFERENCES tcs_navigation_map(id) ON DELETE CASCADE,
+    CONSTRAINT fk_factory_layer_layer_group FOREIGN KEY (layer_group_id) REFERENCES tcs_factory_layer_group(id) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='图层表';
 
 -- ============================================================
 -- 点位表 (Point)
 -- ============================================================
-CREATE TABLE point (
+CREATE TABLE tcs_point (
     id BIGINT NOT NULL AUTO_INCREMENT COMMENT '主键ID',
     navigation_map_id BIGINT NOT NULL COMMENT '归属导航地图ID',
     layer_id BIGINT COMMENT '归属图层ID',
@@ -151,14 +136,14 @@ CREATE TABLE point (
     update_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     del_flag CHAR(1) DEFAULT '0',
     CONSTRAINT pk_point PRIMARY KEY (id),
-    CONSTRAINT fk_point_navigation_map FOREIGN KEY (navigation_map_id) REFERENCES navigation_map(id) ON DELETE CASCADE,
-    CONSTRAINT fk_point_layer FOREIGN KEY (layer_id) REFERENCES factory_layer(id) ON DELETE SET NULL
+    CONSTRAINT fk_point_navigation_map FOREIGN KEY (navigation_map_id) REFERENCES tcs_navigation_map(id) ON DELETE CASCADE,
+    CONSTRAINT fk_point_layer FOREIGN KEY (layer_id) REFERENCES tcs_factory_layer(id) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='点位表';
 
 -- ============================================================
 -- 路径表 (Path)
 -- ============================================================
-CREATE TABLE path (
+CREATE TABLE tcs_path (
     id BIGINT NOT NULL AUTO_INCREMENT COMMENT '主键ID',
     navigation_map_id BIGINT NOT NULL COMMENT '归属导航地图ID',
     layer_id BIGINT COMMENT '归属图层ID',
@@ -177,60 +162,14 @@ CREATE TABLE path (
     update_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     del_flag CHAR(1) DEFAULT '0',
     CONSTRAINT pk_path PRIMARY KEY (id),
-    CONSTRAINT fk_path_navigation_map FOREIGN KEY (navigation_map_id) REFERENCES navigation_map(id) ON DELETE CASCADE,
-    CONSTRAINT fk_path_layer FOREIGN KEY (layer_id) REFERENCES factory_layer(id) ON DELETE SET NULL
+    CONSTRAINT fk_path_navigation_map FOREIGN KEY (navigation_map_id) REFERENCES tcs_navigation_map(id) ON DELETE CASCADE,
+    CONSTRAINT fk_path_layer FOREIGN KEY (layer_id) REFERENCES tcs_factory_layer(id) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='路径表';
-
--- ============================================================
--- 位置表 (Location)
--- ============================================================
-CREATE TABLE location (
-    id BIGINT NOT NULL AUTO_INCREMENT COMMENT '主键ID',
-    navigation_map_id BIGINT NOT NULL COMMENT '归属导航地图ID',
-    layer_id BIGINT COMMENT '归属图层ID',
-    location_type_id BIGINT NOT NULL COMMENT '位置类型ID',
-    location_id VARCHAR(255) NOT NULL COMMENT '位置唯一标识',
-    name VARCHAR(255) NOT NULL COMMENT '位置名称',
-    position_x DECIMAL(12,4) COMMENT 'X坐标',
-    position_y DECIMAL(12,4) COMMENT 'Y坐标',
-    position_z DECIMAL(12,4) DEFAULT 0 COMMENT 'Z坐标',
-    locked TINYINT(1) DEFAULT 0 COMMENT '是否被锁定',
-    is_occupied TINYINT(1) DEFAULT 0 COMMENT '是否被占用',
-    layout JSON COMMENT '位置布局数据',
-    properties JSON COMMENT '扩展属性',
-    create_time DATETIME DEFAULT CURRENT_TIMESTAMP,
-    update_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    del_flag CHAR(1) DEFAULT '0',
-    CONSTRAINT pk_location PRIMARY KEY (id),
-    CONSTRAINT fk_location_navigation_map FOREIGN KEY (navigation_map_id) REFERENCES navigation_map(id) ON DELETE CASCADE,
-    CONSTRAINT fk_location_layer FOREIGN KEY (layer_id) REFERENCES factory_layer(id) ON DELETE SET NULL,
-    CONSTRAINT fk_location_type FOREIGN KEY (location_type_id) REFERENCES location_type(id) ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='位置表';
-
--- ============================================================
--- 区块表 (Block)
--- ============================================================
-CREATE TABLE block (
-    id BIGINT NOT NULL AUTO_INCREMENT COMMENT '主键ID',
-    factory_model_id BIGINT NOT NULL COMMENT '所属工厂ID',
-    navigation_map_id BIGINT COMMENT '所属地图ID',
-    name VARCHAR(255) NOT NULL COMMENT '区块名称',
-    type VARCHAR(50) NOT NULL DEFAULT 'SINGLE' COMMENT '区块类型',
-    members JSON COMMENT '成员点位的point_id列表',
-    color VARCHAR(20) COMMENT '区块显示颜色',
-    properties JSON COMMENT '扩展属性',
-    create_time DATETIME DEFAULT CURRENT_TIMESTAMP,
-    update_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    del_flag CHAR(1) DEFAULT '0',
-    CONSTRAINT pk_block PRIMARY KEY (id),
-    CONSTRAINT fk_block_factory FOREIGN KEY (factory_model_id) REFERENCES factory_model(id) ON DELETE CASCADE,
-    CONSTRAINT fk_block_navigation_map FOREIGN KEY (navigation_map_id) REFERENCES navigation_map(id) ON DELETE SET NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='区块表';
 
 -- ============================================================
 -- 跨层连接表 (CrossLayerConnection)
 -- ============================================================
-CREATE TABLE cross_layer_connection (
+CREATE TABLE tcs_cross_layer_connection (
     id BIGINT NOT NULL AUTO_INCREMENT COMMENT '主键ID',
     factory_model_id BIGINT NOT NULL COMMENT '所属工厂ID',
     connection_id VARCHAR(64) NOT NULL COMMENT '连接唯一标识',
@@ -252,15 +191,15 @@ CREATE TABLE cross_layer_connection (
     update_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     del_flag CHAR(1) DEFAULT '0',
     CONSTRAINT pk_cross_layer_connection PRIMARY KEY (id),
-    CONSTRAINT fk_clc_factory FOREIGN KEY (factory_model_id) REFERENCES factory_model(id) ON DELETE CASCADE,
-    CONSTRAINT fk_clc_source_map FOREIGN KEY (source_navigation_map_id) REFERENCES navigation_map(id) ON DELETE CASCADE,
-    CONSTRAINT fk_clc_dest_map FOREIGN KEY (dest_navigation_map_id) REFERENCES navigation_map(id) ON DELETE CASCADE
+    CONSTRAINT fk_clc_factory FOREIGN KEY (factory_model_id) REFERENCES tcs_factory_model(id) ON DELETE CASCADE,
+    CONSTRAINT fk_clc_source_map FOREIGN KEY (source_navigation_map_id) REFERENCES tcs_navigation_map(id) ON DELETE CASCADE,
+    CONSTRAINT fk_clc_dest_map FOREIGN KEY (dest_navigation_map_id) REFERENCES tcs_navigation_map(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='跨层连接表';
 
 -- ============================================================
 -- 电梯调度记录表 (ElevatorSchedule)
 -- ============================================================
-CREATE TABLE elevator_schedule (
+CREATE TABLE tcs_elevator_schedule (
     id BIGINT NOT NULL AUTO_INCREMENT COMMENT '主键ID',
     connection_id VARCHAR(64) NOT NULL COMMENT '跨层连接ID',
     vehicle_id BIGINT COMMENT '预约车辆ID',
@@ -280,13 +219,10 @@ CREATE TABLE elevator_schedule (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='电梯调度记录表';
 
 -- 创建索引
-CREATE INDEX idx_point_navigation_map ON point(navigation_map_id);
-CREATE INDEX idx_point_layer ON point(layer_id);
-CREATE INDEX idx_path_navigation_map ON path(navigation_map_id);
-CREATE INDEX idx_location_navigation_map ON location(navigation_map_id);
-CREATE INDEX idx_block_factory ON block(factory_model_id);
-CREATE INDEX idx_block_navigation_map ON block(navigation_map_id);
-CREATE INDEX idx_clc_factory ON cross_layer_connection(factory_model_id);
-CREATE INDEX idx_elevator_connection ON elevator_schedule(connection_id);
-CREATE INDEX idx_elevator_vehicle ON elevator_schedule(vehicle_id);
-CREATE INDEX idx_elevator_status ON elevator_schedule(status);
+CREATE INDEX idx_point_navigation_map ON tcs_point(navigation_map_id);
+CREATE INDEX idx_point_layer ON tcs_point(layer_id);
+CREATE INDEX idx_path_navigation_map ON tcs_path(navigation_map_id);
+CREATE INDEX idx_clc_factory ON tcs_cross_layer_connection(factory_model_id);
+CREATE INDEX idx_elevator_connection ON tcs_elevator_schedule(connection_id);
+CREATE INDEX idx_elevator_vehicle ON tcs_elevator_schedule(vehicle_id);
+CREATE INDEX idx_elevator_status ON tcs_elevator_schedule(status);
